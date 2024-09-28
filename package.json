@@ -2,7 +2,7 @@
   "name": "exam",
   "version": "1.0.0",
   "scripts": {
-    "build": "parcel build --public-url https://joshuaaureo.github.io/appsdev-nytimes src/index.html --dist-dir dist",
+    "build": "parcel build --public-url https://joshuaaureo.github.io/nytimes src/index.html --dist-dir dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
