@@ -58,7 +58,6 @@ class TopStories {
     }
 }
 
-
 const nytimes = new News();  
 const topStories = new TopStories();  
 let allHeadlines = [];
@@ -70,50 +69,36 @@ let allHeadlines = [];
 
 function search() {
     const input = document.getElementById('searchbar').value.toLowerCase();
-    const main = document.querySelector('.main');
     const suggestions = document.getElementById('suggestions');
 
-    const uniqueKeywords = [...new Set(allHeadlines.flatMap(story => story.title.toLowerCase().split(' ')))];
-    const suggestedKeywords = uniqueKeywords.filter(keyword => keyword.startsWith(input));
-
     suggestions.innerHTML = '';
+    suggestions.style.display = input.length > 0 ? 'block' : 'none'; 
 
-    if (input.length > 0) {
-        suggestions.style.display = 'block';
+    const filteredHeadlines = allHeadlines.filter(story => 
+        story.title.toLowerCase().includes(input)
+    );
 
-        if (suggestedKeywords.length > 0) {
-            suggestedKeywords.slice(0, 5).forEach(keyword => {
-                const suggestionItem = document.createElement('li');
-                suggestionItem.textContent = keyword;
-                suggestionItem.addEventListener('click', async () => {
-                    document.getElementById('searchbar').value = keyword;
-                    await performSearch(keyword); 
-                    suggestions.style.display = 'none';
-                });
-                suggestions.appendChild(suggestionItem);
-            });
-        } else {
-            const noResultItem = document.createElement('li');
-            noResultItem.textContent = 'No result found';
-            noResultItem.classList.add('no-result');
-            suggestions.appendChild(noResultItem);
-        }
+    if (filteredHeadlines.length > 0) {
+        // Display filtered headlines
+        topStories.display(filteredHeadlines);
 
-        const filteredHeadlines = allHeadlines.filter(story =>
-            story.title.toLowerCase().includes(input)
-        );
-
-        if (filteredHeadlines.length > 0) {
-            topStories.display(filteredHeadlines);
-        } else {
-            const noResultMessage = document.createElement('div');
-            noResultMessage.textContent = 'No result found';
-            noResultMessage.classList.add('no-result');
-            main.innerHTML = '';
-            main.appendChild(noResultMessage);
-        }
+        // Show suggestions
+        const uniqueTitles = [...new Set(filteredHeadlines.map(story => story.title))];
+        uniqueTitles.slice(0, 5).forEach(title => {
+            const suggestionItem = document.createElement('li');
+            suggestionItem.textContent = title;
+            suggestionItem.onclick = () => {
+                document.getElementById('searchbar').value = title;
+                suggestions.style.display = 'none';
+                performSearch(title); 
+            };
+            suggestions.appendChild(suggestionItem);
+        });
     } else {
-        suggestions.style.display = 'none';
+        const noResultItem = document.createElement('li');
+        noResultItem.textContent = 'No result found';
+        noResultItem.classList.add('no-result');
+        suggestions.appendChild(noResultItem);
     }
 }
 
@@ -121,24 +106,20 @@ async function performSearch(selectedKeyword) {
     const main = document.querySelector('.main');
     const suggestions = document.getElementById('suggestions');
 
-    return new Promise(async (resolve) => {
-        const storiesByKeyword = allHeadlines.filter(story =>
-            story.title.toLowerCase().includes(selectedKeyword)
-        );
-        suggestions.innerHTML = '';
+    const storiesByKeyword = allHeadlines.filter(story => 
+        story.title.toLowerCase().includes(selectedKeyword)
+    );
 
-        setTimeout(() => {
-            if (storiesByKeyword.length > 0) {
-                main.style.display = 'block';
-                topStories.display(storiesByKeyword);
-            } else {
-                const noResultMessage = document.createElement('div');
-                noResultMessage.textContent = 'No result found';
-                noResultMessage.classList.add('no-result');
-                main.innerHTML = '';
-                main.appendChild(noResultMessage);
-            }
-            resolve(); 
-        }, 2000); 
-    });
+    suggestions.innerHTML = '';
+
+    if (storiesByKeyword.length > 0) {
+        main.style.display = 'block';
+        topStories.display(storiesByKeyword);
+    } else {
+        const noResultMessage = document.createElement('div');
+        noResultMessage.textContent = 'No result found';
+        noResultMessage.classList.add('no-result');
+        main.innerHTML = '';
+        main.appendChild(noResultMessage);
+    }
 }
