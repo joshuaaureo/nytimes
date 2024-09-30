@@ -10,7 +10,6 @@ class News {
 
 class TopStories {
     display(stories) {
-        console.log(stories); 
         const main = document.querySelector('.main');
         const featuredStory = document.querySelector('.featured-story');
         const headlineContainer = document.querySelector('.headline-container');
@@ -30,6 +29,10 @@ class TopStories {
             featuredTitle.textContent = firstStory.title;
             featuredStory.appendChild(featuredTitle);
 
+            const featuredAbstract = document.createElement('p');
+            featuredAbstract.textContent = firstStory.abstract; // Add abstract
+            featuredStory.appendChild(featuredAbstract);
+
             featuredStory.addEventListener('click', () => {
                 window.open(firstStory.url, '_blank');
             });
@@ -48,6 +51,10 @@ class TopStories {
                 title.textContent = story.title;
                 headline.appendChild(title);
 
+                const abstract = document.createElement('p');
+                abstract.textContent = story.abstract; // Add abstract
+                headline.appendChild(abstract);
+
                 headline.addEventListener('click', () => {
                     window.open(story.url, '_blank');
                 });
@@ -58,13 +65,13 @@ class TopStories {
     }
 }
 
-const nytimes = new News();  
-const topStories = new TopStories();  
+const nytimes = new News();
+const topStories = new TopStories();
 let allHeadlines = [];
 
 (async () => {
-    allHeadlines = await nytimes.getHeadlines();  
-    topStories.display(allHeadlines);  
+    allHeadlines = await nytimes.getHeadlines();
+    topStories.display(allHeadlines);
 })();
 
 function search() {
@@ -72,17 +79,14 @@ function search() {
     const suggestions = document.getElementById('suggestions');
 
     suggestions.innerHTML = '';
-    suggestions.style.display = input.length > 0 ? 'block' : 'none'; 
+    suggestions.style.display = input.length > 0 ? 'block' : 'none';
 
-    const filteredHeadlines = allHeadlines.filter(story => 
+    const filteredHeadlines = allHeadlines.filter(story =>
         story.title.toLowerCase().includes(input)
     );
 
     if (filteredHeadlines.length > 0) {
-        // Display filtered headlines
         topStories.display(filteredHeadlines);
-
-        // Show suggestions
         const uniqueTitles = [...new Set(filteredHeadlines.map(story => story.title))];
         uniqueTitles.slice(0, 5).forEach(title => {
             const suggestionItem = document.createElement('li');
@@ -90,7 +94,7 @@ function search() {
             suggestionItem.onclick = () => {
                 document.getElementById('searchbar').value = title;
                 suggestions.style.display = 'none';
-                performSearch(title); 
+                performSearch(title);
             };
             suggestions.appendChild(suggestionItem);
         });
@@ -106,7 +110,7 @@ async function performSearch(selectedKeyword) {
     const main = document.querySelector('.main');
     const suggestions = document.getElementById('suggestions');
 
-    const storiesByKeyword = allHeadlines.filter(story => 
+    const storiesByKeyword = allHeadlines.filter(story =>
         story.title.toLowerCase().includes(selectedKeyword)
     );
 
